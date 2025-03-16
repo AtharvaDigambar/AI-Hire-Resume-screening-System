@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIHire - Job Seeker Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e6f2 100%);
+            color: #2c3e50;
+            line-height: 1.6;
+            transition: background 0.4s ease, color 0.4s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #1e272e 0%, #2c3e50 100%);
+            color: #dcdcdc;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: #ffffff;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: background 0.4s ease;
+        }
+
+        .dark-mode .navbar {
+            background: #2d3436;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar .logo {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #2980b9;
+        }
+
+        .navbar ul {
+            list-style: none;
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .navbar ul li a {
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .dark-mode .navbar ul li a {
+            color: #dcdcdc;
+        }
+
+        .navbar ul li a:hover {
+            color: #2980b9;
+        }
+
+        .notifications {
+            position: relative;
+        }
+
+        .notifications .bell {
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        .notifications .dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            width: 250px;
+            padding: 10px;
+            z-index: 1001;
+        }
+
+        .dark-mode .notifications .dropdown {
+            background: #2d3436;
+        }
+
+        .notifications .dropdown li {
+            padding: 10px;
+            border-bottom: 1px solid #eef2f7;
+        }
+
+        .dark-mode .notifications .dropdown li {
+            border-bottom: 1px solid #3b444b;
+        }
+
+        .notifications .dropdown li:last-child {
+            border-bottom: none;
+        }
+
+        /* Welcome Header */
+        .welcome-header {
+            text-align: center;
+            padding: 30px 0;
+            font-size: 2.2em;
+            color: #34495e;
+            font-weight: 600;
+        }
+
+        .dark-mode .welcome-header {
+            color: #ecf0f1;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px 30px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 30px;
+            animation: fadeIn 0.5s ease-in;
+            flex: 1;
+        }
+
+        .sidebar {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+            transition: transform 0.3s ease, background 0.4s ease;
+        }
+
+        .dark-mode .sidebar {
+            background: #2d3436;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar:hover {
+            transform: translateY(-5px);
+        }
+
+        .main-content {
+            display: grid;
+            gap: 30px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, background 0.4s ease;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .dark-mode .card {
+            background: #2d3436;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+        }
+
+        .toggle-btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.3s ease, background 0.4s ease;
+        }
+
+        .toggle-btn:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #2980b9, #1b5e7d);
+        }
+
+        .job-list, .tracker-list, .skills-list, .saved-jobs, .networking-list {
+            list-style: none;
+        }
+
+        .job-list li, .tracker-list li, .skills-list li, .saved-jobs li, .networking-list li {
+            padding: 15px;
+            border-bottom: 1px solid #eef2f7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+
+        .job-list li:hover, .tracker-list li:hover, .saved-jobs li:hover, .networking-list li:hover {
+            background: #f8f9fa;
+        }
+
+        .dark-mode .job-list li, .dark-mode .tracker-list li, .dark-mode .saved-jobs li, .dark-mode .networking-list li {
+            border-bottom: 1px solid #3b444b;
+        }
+
+        .dark-mode .job-list li:hover, .dark-mode .tracker-list li:hover, .dark-mode .saved-jobs li:hover, .dark-mode .networking-list li:hover {
+            background: #3b444b;
+        }
+
+        .apply-btn, .save-btn, .remove-btn, .connect-btn {
+            padding: 8px 15px;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .apply-btn {
+            background: #27ae60;
+        }
+
+        .apply-btn:hover {
+            background: #219653;
+        }
+
+        .save-btn {
+            background: #3498db;
+        }
+
+        .save-btn:hover {
+            background: #2980b9;
+        }
+
+        .remove-btn {
+            background: #e74c3c;
+        }
+
+        .remove-btn:hover {
+            background: #c0392b;
+        }
+
+        .connect-btn {
+            background: #2980b9;
+        }
+
+        .connect-btn:hover {
+            background: #1b5e7d;
+        }
+
+        #application-tracker, #profile-strength, #skills-assessment {
+            display: none;
+        }
+
+        #resume-feedback, #skills-feedback, #interview-feedback {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #27ae60;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .filters select, .filters input {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #dfe6e9;
+            background: #fff;
+            transition: border 0.3s ease;
+        }
+
+        .dark-mode .filters select, .dark-mode .filters input {
+            background: #3b444b;
+            border: 1px solid #576574;
+            color: #dcdcdc;
+        }
+
+        .filters select:focus, .filters input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        /* Interactive AI Assistant */
+        .chatbot {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: #fff;
+            padding: 15px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .chatbot:hover {
+            transform: scale(1.1);
+        }
+
+        .chat-window {
+            position: fixed;
+            bottom: 80px;
+            right: 30px;
+            width: 350px;
+            height: 400px;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .dark-mode .chat-window {
+            background: #2d3436;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: #fff;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h3 {
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .chat-header .close-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.2em;
+            cursor: pointer;
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .dark-mode .chat-body {
+            background: #3b444b;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 10px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background: #3498db;
+            color: #fff;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .ai-message {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .dark-mode .ai-message {
+            background: #576574;
+            color: #dcdcdc;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background: #ffffff;
+            border-top: 1px solid #dfe6e9;
+        }
+
+        .dark-mode .chat-input {
+            background: #2d3436;
+            border-top: 1px solid #3b444b;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #dfe6e9;
+            border-radius: 5px 0 0 5px;
+            outline: none;
+        }
+
+        .dark-mode .chat-input input {
+            background: #3b444b;
+            border: 1px solid #576574;
+            color: #dcdcdc;
+        }
+
+        .chat-input button {
+            padding: 10px 20px;
+            background: #27ae60;
+            color: #fff;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .chat-input button:hover {
+            background: #219653;
+        }
+
+        /* Profile Strength Meter */
+        .profile-meter {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .profile-meter svg {
+            transform: rotate(-90deg);
+        }
+
+        .profile-meter circle {
+            fill: none;
+            stroke-width: 10;
+            stroke: #dfe6e9;
+        }
+
+        .profile-meter .progress {
+            stroke: url(#gradient);
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        /* Skills List */
+        .skills-list li {
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .skills-list li div {
+            background: linear-gradient(90deg, #27ae60, #219653);
+            height: 5px;
+            border-radius: 5px;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            color: #ecf0f1;
+            padding: 40px 30px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .dark-mode .footer {
+            background: linear-gradient(135deg, #2d3436 0%, #1e272e 100%);
+        }
+
+        .footer-column {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-column h4 {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: #3498db;
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-column ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-column ul li a:hover {
+            color: #3498db;
+        }
+
+        .footer-column .social-icons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .footer-column .social-icons a {
+            color: #ecf0f1;
+            font-size: 1.5em;
+            transition: color 0.3s ease;
+        }
+
+        .footer-column .social-icons a:hover {
+            color: #3498db;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                position: static;
+            }
+            .navbar ul {
+                gap: 15px;
+            }
+            .chat-window {
+                width: 300px;
+                height: 350px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .footer {
+                flex-direction: column;
+                text-align: center;
+            }
+            .footer-column .social-icons {
+                justify-content: center;
+            }
+            .chat-window {
+                width: 90%;
+                right: 5%;
+                bottom: 70px;
+            }
+        }
+        .containerd {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+textarea {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+input[type="file"] {
+    margin-bottom: 20px;
+}
+
+button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#results {
+    margin-top: 20px;
+}
+
+.result-item {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.result-item:last-child {
+    border-bottom: none;
+}
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <div class="logo">AIHire</div>
+        <ul>
+            <li><a href="http://localhost//aihire/templates/login.html">Login</a></li>
+            <li><a href="#dashboard">Dashboard</a></li>
+            <li><a href="#jobs">Jobs</a></li>
+            <li><a href="#profile">Profile</a></li>
+            <li><a href="#settings">Settings</a></li>
+            <li class="notifications">
+                <i class="fas fa-bell bell" onclick="toggleNotifications()"></i>
+                <ul class="dropdown" id="notifications-dropdown">
+                    <li>New job match: AI Engineer</li>
+                    <li>Interview scheduled: Mar 20</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Welcome Header -->
+    <h1 class="welcome-header">Welcome to Your Dashboard!</h1>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2>AIHire</h2>
+            <div class="containerd">
+                <h3>AI Resume Screener</h3>
+                <textarea id="skills-input" placeholder="e.g., Required: Python, SQL; Optional: ML, AWS"></textarea>
+                <input type="file" id="resume-upload" multiple accept=".pdf,.txt">
+                <button id="screen-button">Screen Resumes</button>
+                <div id="results"></div>
+            </div>
+        
+            <script src="{{ url_for('static', filename='app.js') }}"></script>
+            <div class="card profile-meter" id="profile-strength">
+                <h3>Profile Strength</h3>
+                <svg width="100" height="100">
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#3498db;" />
+                            <stop offset="100%" style="stop-color:#2980b9;" />
+                        </linearGradient>
+                    </defs>
+                    <circle cx="50" cy="50" r="45" />
+                    <circle class="progress" cx="50" cy="50" r="45" stroke-dasharray="283" stroke-dashoffset="0" id="profile-progress" />
+                </svg>
+                <p id="profile-feedback">Analyzing...</p>
+            </div>
+            <button class="toggle-btn" onclick="toggleMode()">
+                <i class="fas fa-moon"></i> Toggle Mode
+            </button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Job Recommendations -->
+            <div class="card">
+                <h3>Trending Job Recommendations</h3>
+                <div class="filters">
+                    <select>
+                        <option>Industry</option>
+                        <option>Tech</option>
+                        <option>Finance</option>
+                        <option>Healthcare</option>
+                    </select>
+                    <select>
+                        <option>Experience</option>
+                        <option>Entry</option>
+                        <option>Mid</option>
+                        <option>Senior</option>
+                    </select>
+                    <input type="text" placeholder="Salary Range">
+                    <input type="text" placeholder="Location">
+                </div>
+                <ul class="job-list">
+                    <li>AI Developer - Google <span>45-50L, Pune <button class="apply-btn" onclick="applyForJob('AI Developer - Google')">Apply</button> <button class="save-btn" onclick="saveJob('AI Developer - xAI')">Save</button></span></li>
+                    <li>Data Scientist - Meta <span>20-25L, Bengalore <button class="apply-btn" onclick="applyForJob('Data Scientist - Meta')">Apply</button> <button class="save-btn" onclick="saveJob('Data Scientist - TechCorp')">Save</button></span></li>
+                    <li>Product Manager - HSBC <span>30,-40L Hydrabad  <button class="apply-btn" onclick="applyForJob('Product Manager - HSBC')">Apply</button> <button class="save-btn" onclick="saveJob('Product Manager - FinTech')">Save</button></span></li>
+                </ul>
+            </div>
+
+            <!-- Saved Jobs -->
+            <div class="card">
+                <h3>Saved Jobs</h3>
+                <ul class="saved-jobs" id="saved-jobs-list">
+                    <!-- Dynamically populated -->
+                </ul>
+            </div>
+
+            <!-- Application Tracker -->
+            <div class="card" id="application-tracker">
+                <h3>Application Tracker</h3>
+                <ul class="tracker-list" id="tracker-list">
+                    <!-- Dynamically populated -->
+                </ul>
+            </div>
+
+            <!-- Career Insights -->
+            <div class="card">
+                <h3>Career Insights</h3>
+                <p>Trending Skill: Machine Learning (+20% demand)</p>
+                <p>Avg Salary: $110k for Tech Roles</p>
+            </div>
+
+            <!-- Interview Prep -->
+            <div class="card">
+                <h3>Interview Prep</h3>
+                <button class="toggle-btn" onclick="startInterview()" style="margin: 15px 0;">Start Mock Interview</button>
+                <p id="interview-feedback">Click to begin!</p>
+            </div>
+
+            <!-- Networking Opportunities -->
+            <div class="card">
+                <h3>Networking</h3>
+                <ul class="networking-list">
+                    <li>Ram Shukla - Recruiter <button class="connect-btn" onclick="requestConnection(this)">Connect</button></li>
+                    <li>Harneet Sing - AI Expert <button class="connect-btn" onclick="requestConnection(this)">Connect</button></li>
+                </ul>
+            </div>
+
+            <!-- Skills Assessment -->
+            <div class="card" id="skills-assessment">
+                <h3>Skills Assessment</h3>
+                <button class="toggle-btn" onclick="startSkillsAssessment()" style="margin: 15px 0;">Take Skills Quiz</button>
+                <ul class="skills-list" id="skills-list">
+                    <!-- Dynamically populated -->
+                </ul>
+                <p id="skills-feedback">Starting Soon!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-column">
+            <h4>AIHire</h4>
+            <p>Your AI-Powered Recruitment Partner.</p>
+        </div>
+        <div class="footer-column">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="#about">About Us</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="#privacy">Privacy Policy</a></li>
+                <li><a href="#terms">Terms of Service</a></li>
+            </ul>
+        </div>
+        <div class="footer-column">
+            <h4>Follow Us</h4>
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-facebook"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- AI Chatbot -->
+    <div class="chatbot" onclick="toggleChat()">
+        <i class="fas fa-robot"></i> AI Assistant
+    </div>
+    <div class="chat-window" id="chat-window">
+        <div class="chat-header">
+            <h3>AI Assistant</h3>
+            <button class="close-btn" onclick="toggleChat()">✖</button>
+        </div>
+        <div class="chat-body" id="chat-body">
+            <div class="ai-message">Hello! How can I assist you today?</div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chat-input" placeholder="Type your message..." onkeypress="if(event.key === 'Enter') sendMessage()">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // Dark Mode Toggle
+        function toggleMode() {
+            document.body.classList.toggle('dark-mode');
+            const btn = document.querySelector('.toggle-btn');
+            btn.innerHTML = document.body.classList.contains('dark-mode') 
+                ? '<i class="fas fa-sun"></i> Light Mode' 
+                : '<i class="fas fa-moon"></i> Dark Mode';
+        }
+
+        // Resume Upload Feedback, Profile Strength, and Skills Assessment
+        document.getElementById('resume-upload').addEventListener('change', function() {
+            const feedback = document.getElementById('resume-feedback');
+            const profileStrength = document.getElementById('profile-strength');
+            const profileProgress = document.getElementById('profile-progress');
+            const profileFeedback = document.getElementById('profile-feedback');
+            const skillsAssessment = document.getElementById('skills-assessment');
+            const skillsList = document.getElementById('skills-list');
+            
+            feedback.textContent = "AI Feedback: Resume analyzed successfully!";
+            
+            const score = Math.floor(Math.random() * 41) + 60;
+            const dashOffset = 283 - (283 * (score / 100));
+            
+            profileStrength.style.display = 'block';
+            profileStrength.style.animation = 'slideUp 0.6s ease-out';
+            profileProgress.setAttribute('stroke-dashoffset', dashOffset);
+            profileFeedback.textContent = `${score}% Complete - ${score < 80 ? 'Add more details!' : 'Looking strong!'}`;
+
+
+            skillsAssessment.style.display = 'block';
+            skillsAssessment.style.animation = 'slideUp 0.6s ease-out';
+            skillsList.innerHTML = '';
+            skills.forEach(skill => {
+                const li = document.createElement('li');
+                li.innerHTML = `${skill.name} <span style="color: #27ae60;">${skill.level}%</span> <div style="width: ${skill.level}%;"></div>`;
+                skillsList.appendChild(li);
+            });
+        });
+
+        // Apply for Job
+        function applyForJob(jobTitle) {
+            const tracker = document.getElementById('application-tracker');
+            const trackerList = document.getElementById('tracker-list');
+            if (tracker.style.display === 'none' || tracker.style.display === '') {
+                tracker.style.display = 'block';
+                tracker.style.animation = 'slideUp 0.6s ease-out';
+            }
+            const li = document.createElement('li');
+            li.innerHTML = `${jobTitle} <span>Submitted (${new Date().toLocaleDateString()})</span>`;
+            trackerList.appendChild(li);
+            const btn = document.querySelector(`button[onclick="applyForJob('${jobTitle}')"]`);
+            btn.disabled = true;
+            btn.textContent = 'Applied';
+            btn.style.background = '#7f8c8d';
+        }
+
+        // Save Job
+        function saveJob(jobTitle) {
+            const savedJobsList = document.getElementById('saved-jobs-list');
+            const li = document.createElement('li');
+            li.innerHTML = `${jobTitle} <button class="remove-btn" onclick="this.parentElement.remove()">Remove</button>`;
+            savedJobsList.appendChild(li);
+            const btn = document.querySelector(`button[onclick="saveJob('${jobTitle}')"]`);
+            btn.disabled = true;
+            btn.textContent = 'Saved';
+            btn.style.background = '#7f8c8d';
+        }
+
+        // Skills Assessment Quiz
+        function startSkillsAssessment() {
+            document.getElementById('skills-feedback').textContent = "Soon!";
+        }
+
+        // Interview Prep
+        function startInterview() {
+            document.getElementById('interview-feedback').textContent = "Schedule Soon!";
+        }
+
+        // Notifications Toggle
+        function toggleNotifications() {
+            const dropdown = document.getElementById('notifications-dropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Interactive Chatbot
+        function toggleChat() {
+            const chatWindow = document.getElementById('chat-window');
+            chatWindow.style.display = chatWindow.style.display === 'block' ? 'none' : 'block';
+        }
+        // Request Connection
+        function requestConnection(button) {
+            button.textContent = 'Requested';
+            button.disabled = true; // Prevents multiple clicks
+            button.style.background = '#7f8c8d'; // Changes to a neutral color (e.g., gray)
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const chatBody = document.getElementById('chat-body');
+            const message = input.value.trim();
+
+            if (message) {
+                // Add user message
+                const userMsg = document.createElement('div');
+                userMsg.className = 'message user-message';
+                userMsg.textContent = message;
+                chatBody.appendChild(userMsg);
+
+                // AI response logic (mocked)
+                const aiMsg = document.createElement('div');
+                aiMsg.className = 'message ai-message';
+                aiMsg.textContent = getAIResponse(message);
+                setTimeout(() => chatBody.appendChild(aiMsg), 500); // Simulate delay
+
+                // Clear input and scroll to bottom
+                input.value = '';
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }
+        }
+
+        function getAIResponse(message) {
+            const lowerMsg = message.toLowerCase();
+            if (lowerMsg.includes('resume')) {
+                return "Try adding quantifiable results to your resume, like 'Increased sales by 20%'!";
+            } else if (lowerMsg.includes('job') || lowerMsg.includes('apply')) {
+                return "I can help you find jobs! Check the 'Job Recommendations' section or ask me for tips.";
+            } else if (lowerMsg.includes('skills')) {
+                return "Upload your resume to see your skills, or take the Skills Quiz for improvement suggestions!";
+            } else if (lowerMsg.includes('interview')) {
+                return "Practice with the 'Interview Prep' section. Want a sample question? Try: 'Tell me about yourself.'";
+            } else {
+                return "I'm here to help! Ask me about resumes, jobs, skills, or interviews.";
+            }
+        }
+        document.getElementById("screen-button").addEventListener("click", async () => {
+    const skillsInput = document.getElementById("skills-input").value;
+    const files = document.getElementById("resume-upload").files;
+
+    if (!skillsInput || files.length === 0) {
+        alert("Please enter skills and upload at least one resume.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("skills", skillsInput);
+    for (let file of files) {
+        formData.append("resumes", file);
+    }
+
+    try {
+        const response = await fetch("/screen-resumes", {
+            method: "POST",
+            body: formData,
+        });
+        const results = await response.json();
+
+        const resultsDiv = document.getElementById("results");
+        resultsDiv.innerHTML = results.map(result => `
+            <div class="result-item">
+                <strong>${result.resume}</strong>: ${result.score}%<br>
+                ${result.details}
+            </div>
+        `).join("");
+    } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred while processing the resumes.");
+    }
+});
+    </script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIHire - Sign Up</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e6f2 100%);
+            color: #2c3e50;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #1e272e 0%, #2c3e50 100%);
+            color: #dcdcdc;
+        }
+
+        .container {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .dark-mode .container {
+            background: #2d3436;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2em;
+            color: #34495e;
+            margin-bottom: 30px;
+        }
+
+        .dark-mode h1 {
+            color: #ecf0f1;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dfe6e9;
+            border-radius: 8px;
+            background: #fff;
+            transition: border 0.3s ease;
+        }
+
+        .dark-mode .form-group input, .dark-mode .form-group select {
+            background: #3b444b;
+            border: 1px solid #576574;
+            color: #dcdcdc;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .toggle-btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 500;
+            transition: transform 0.3s ease, background 0.4s ease;
+        }
+
+        .toggle-btn:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #2980b9, #1b5e7d);
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .links a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .dark-mode .links a {
+            color: #66b0ff;
+        }
+
+        .links a:hover {
+            color: #2980b9;
+        }
+
+        .mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.3s ease, background 0.4s ease;
+        }
+
+        .mode-toggle:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #2980b9, #1b5e7d);
+        }
+
+        /* Animations */
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px;
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="mode-toggle" onclick="toggleMode()">
+        <i class="fas fa-moon"></i> Toggle Mode
+    </button>
+    <div class="container">
+        <h1>Sign Up for AIHire</h1>
+        <form onsubmit="signup(event)">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" placeholder="Enter your full name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Create a password" required minlength="8">
+            </div>
+            <div class="form-group">
+                <label for="role">Role</label>
+                <select id="role" required>
+                    <option value="" disabled selected>Select your role</option>
+                    <option value="recruiter">Recruiter</option>
+                    <option value="job-seeker">Job Seeker</option>
+                </select>
+            </div>
+            <button type="submit" class="toggle-btn">Sign Up</button>
+        </form>
+        <div class="links">
+            <p>Already have an account? <a href="login.html">Login</a></p>
+        </div>
+    </div>
+
+    <script>
+        function toggleMode() {
+            document.body.classList.toggle('dark-mode');
+            const btn = document.querySelector('.mode-toggle');
+            btn.innerHTML = document.body.classList.contains('dark-mode') 
+                ? '<i class="fas fa-sun"></i> Light Mode' 
+                : '<i class="fas fa-moon"></i> Dark Mode';
+        }
+
+        function signup(event) {
+            event.preventDefault();
+        
+            let name = document.getElementById("name").value;
+            let email = document.getElementById("email").value;
+            let password = document.getElementById("password").value;
+            let role = document.getElementById("role").value;
+        
+            let formData = new FormData();
+            formData.append("name", name);
+            formData.append("email", email);
+            formData.append("password", password);
+            formData.append("role", role);
+        
+            fetch("signup.php", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (data.status === "success") {
+                    window.location.href = "login.html"; // Redirect to login
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
+</body>
+</html>
